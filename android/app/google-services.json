@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "624745750399",
+    "project_id": "clickcart-71df1",
+    "storage_bucket": "clickcart-71df1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624745750399:android:2b217905b472954509044a",
+        "android_client_info": {
+          "package_name": "com.example.clickcart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuAGklBOFYA-e9CaIWg6AA_C9f88fuG00"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
