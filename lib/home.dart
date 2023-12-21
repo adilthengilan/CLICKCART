@@ -1,9 +1,12 @@
 import 'package:clickcart/detailPage.dart';
 import 'package:clickcart/functions/provider.dart';
+import 'package:clickcart/searchpage.dart';
+import 'package:clickcart/wishlist.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -13,11 +16,20 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final Search = TextEditingController();
+
+  void initState() {
+    super.initState();
+    initialNotification();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final data = Provider.of<fetchDatas>(context);
     return SingleChildScrollView(
       child: Consumer<fetchDatas>(builder: (context, value, child) {
+        // value.fetchDataFromFirestore();
+        // value.FromFirestore();
         return SizedBox(
           height: 820,
           width: double.infinity,
@@ -29,7 +41,7 @@ class _DashboardState extends State<Dashboard> {
                   children: [
                     Container(
                       margin: EdgeInsets.only(
-                          left: MediaQuery.of(context).size.width / 15),
+                          left: MediaQuery.of(context).size.width / 20),
                       height: 100,
                       width: 100,
                       decoration: BoxDecoration(
@@ -37,17 +49,25 @@ class _DashboardState extends State<Dashboard> {
                               image: AssetImage('assets/images/logo.png'))),
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Likes(),
+                            ));
+                      },
                       child: Container(
                         margin: EdgeInsets.only(
                             left: MediaQuery.of(context).size.width / 2.5),
                         height: 40,
                         width: 40,
                         decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 234, 234, 234),
+                            color: Colors.transparent,
                             borderRadius:
                                 BorderRadius.all(Radius.circular(20))),
-                        child: Icon(Icons.favorite, color: Colors.red),
+                        child: Icon(
+                          Icons.favorite_outline,
+                        ),
                       ),
                     ),
                     Container(
@@ -55,6 +75,14 @@ class _DashboardState extends State<Dashboard> {
                       height: 40,
                       width: 40,
                       decoration: BoxDecoration(
+                          image: (auth.currentUser!.photoURL != null)
+                              ? DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: NetworkImage(
+                                      '${auth.currentUser!.photoURL}'))
+                              : DecorationImage(
+                                  image: AssetImage(
+                                      'assets/images/userprofile.png')),
                           color: Colors.white,
                           borderRadius: BorderRadius.all(Radius.circular(20))),
                     )
@@ -67,18 +95,26 @@ class _DashboardState extends State<Dashboard> {
                   Container(
                     height: 40,
                     width: MediaQuery.of(context).size.width / 1.3,
-                    child: TextField(
-                      onChanged: (value) {
-                        data.filterProducts(value);
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SearchPage(),
+                            ));
                       },
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.fromLTRB(20, 15, 0, 0),
-                        hintText: "Search...",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
+                      child: TextField(
+                        decoration: InputDecoration(
+                          enabled: false,
+                          contentPadding:
+                              const EdgeInsets.fromLTRB(20, 15, 0, 0),
+                          hintText: "Search...",
+                          filled: true,
+                          fillColor: Color.fromARGB(255, 242, 240, 240),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
                     ),
@@ -88,7 +124,7 @@ class _DashboardState extends State<Dashboard> {
                     height: 40,
                     width: 40,
                     decoration: BoxDecoration(
-                        color: Color.fromARGB(166, 175, 16, 69),
+                        color: Color.fromARGB(166, 16, 90, 175),
                         borderRadius: BorderRadius.all(Radius.circular(10))),
                     child: Center(
                       child: Icon(Icons.tune, color: Colors.white),
@@ -97,14 +133,14 @@ class _DashboardState extends State<Dashboard> {
                 ]),
               ),
               Container(
-                margin: EdgeInsets.only(right: 260, top: 20),
+                margin: EdgeInsets.only(right: 240, top: 20),
                 child: Text(
                   'Products',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                 ),
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height / 1.57,
+                height: MediaQuery.of(context).size.height / 1.61,
                 width: double.infinity,
                 child: Categories(),
               )
@@ -114,8 +150,58 @@ class _DashboardState extends State<Dashboard> {
       }),
     );
   }
+
+  final Message = FirebaseMessaging.instance;
+
+  Future<void> initialNotification() async {
+    await Message.requestPermission();
+    final FCMTOken = await Message.getToken();
+    print('FCM TOken : $FCMTOken');
+    FirebaseMessaging.onBackgroundMessage(handleBackGroundMessage);
+  }
+
+  Future<void> handleBackGroundMessage(RemoteMessage message) async {
+    print('Title : ${message.notification?.title}');
+    print('body : ${message.notification?.body}');
+    print('data : ${message.data}');
+  }
+
+  void handleMessage(RemoteMessage? message) async {
+    if (message != null) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Likes(),
+          ));
+    } else {
+      return;
+    }
+  }
+  // Future<void> configureFirebaseMessaging() async {
+  //   final data = Provider.of<fetchDatas>(context, listen: false);
+
+  //   FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  //   // For handling foreground messages
+  //   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  //     print("Received message: ${message.messageId}");
+  //     data.addNotification('${message.messageId}');
+  //     // Handle the foreground message here
+  //   });
+
+  //   // For handling when the app is in the background but opened by clicking on a notification
+  //   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+  //     print("Opened message: ${message.messageId}");
+  //     // Handle the message when the app is opened from the notification
+  //   });
+
+  //   // Request permission for iOS (if needed)
+  //   NotificationSettings settings = await messaging.requestPermission();
+  //   print("Notification settings: $settings");
+  // }
 }
 
+List<QueryDocumentSnapshot> documents = [];
 final CollectionReference Cart = FirebaseFirestore.instance.collection('Cart');
 final CollectionReference Total =
     FirebaseFirestore.instance.collection('totalprice');
@@ -141,24 +227,26 @@ class Categories extends StatefulWidget {
 }
 
 final class _CategoriesState extends State<Categories> {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<fetchDatas>(context);
-    data.filteredProducts = data.products;
-    final products = Provider.of<fetchDatas>(context).products;
-    return products.isNotEmpty
+    data.fetchDataFromFirestore();
+    return (data.products.isNotEmpty)
         ? GridView.builder(
+            shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 childAspectRatio: 100 / 125,
                 crossAxisCount: 2,
                 mainAxisSpacing: 20),
-            itemCount: data.filteredProducts.length,
+            itemCount: data.products.length,
             itemBuilder: (context, index) {
               return Consumer<fetchDatas>(builder: (context, value, child) {
                 return GridTile(
                     child: GestureDetector(
                   onTap: () {
-                    value.currentindex = index;
+                    // value.currentindex = index;
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -192,7 +280,7 @@ final class _CategoriesState extends State<Categories> {
                                   image: DecorationImage(
                                       fit: BoxFit.fill,
                                       image: NetworkImage(
-                                          '${data.filteredProducts[index]['thumbnail']}')),
+                                          '${data.products[index]['thumbnail']}')),
                                   color: Colors.white,
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
@@ -203,7 +291,7 @@ final class _CategoriesState extends State<Categories> {
                                 height: 40,
                                 width: 100,
                                 child: Text(
-                                  data.filteredProducts[index]['title'],
+                                  data.products[index]['title'],
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 10),
@@ -215,7 +303,7 @@ final class _CategoriesState extends State<Categories> {
                                 Container(
                                     margin: EdgeInsets.only(left: 15),
                                     child: Text(
-                                      '\$${data.filteredProducts[index]['price']}',
+                                      '\$${data.products[index]['price']}',
                                       style: TextStyle(
                                           fontWeight: FontWeight.w800,
                                           fontSize: 18),
@@ -224,8 +312,7 @@ final class _CategoriesState extends State<Categories> {
                                   padding: EdgeInsets.only(left: 20),
                                   child: Icon(Icons.star),
                                 ),
-                                Text(
-                                    '${data.filteredProducts[index]['rating']}')
+                                Text('${data.products[index]['rating']}')
                               ],
                             ),
                           ],
@@ -240,13 +327,18 @@ final class _CategoriesState extends State<Categories> {
                                   BorderRadius.all(Radius.circular(15))),
                           child: InkWell(
                             onTap: () {
-                              User? user = FirebaseAuth.instance.currentUser;
+                              // User? user = FirebaseAuth.instance.currentUser;
                               // addCartlist(index);
                               // addCart();
-                              if (user != null) {
-                                value.currentindex = index;
-                                value.saveUserData(user.uid);
-                              }
+                              bool isinCart = data.cartProductid
+                                  .contains(data.products[index]['id']);
+                              isinCart
+                                  ? value.showToast('Already in Cart')
+                                  : [
+                                      value.currentindex = index,
+                                      value.saveUserData(),
+                                      value.showToast('Product Added to Cart')
+                                    ];
                             },
                             child: Icon(
                               Icons.shopping_cart,

@@ -1,6 +1,7 @@
 import 'package:clickcart/dashboard.dart';
 import 'package:clickcart/functions/provider.dart';
-import 'package:clickcart/home.dart';
+import 'package:clickcart/signupPage.dart';
+import 'package:clickcart/splashscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,8 +15,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  bool obsecureText = true;
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    final Screenheight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -23,21 +32,23 @@ class _LoginPageState extends State<LoginPage> {
             Center(
               child: Container(
                 margin: EdgeInsets.only(top: 30),
-                height: 300,
-                width: 300,
+                height: 350,
+                width: 350,
                 child: LottieBuilder.asset(
                     'assets/animations/Animation - 1700111312990.json'),
               ),
             ),
             Container(
+              margin: EdgeInsets.only(top: Screenheight / 100),
               height: 40,
               width: 300,
               child: TextField(
-                controller: _emailController,
+                controller: emailController,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.only(top: 10, left: 20),
                     hintText: 'email or username',
-                    suffixIcon: Icon(Icons.account_box, color: Colors.black),
+                    prefixIcon:
+                        Icon(Icons.account_circle_rounded, color: Colors.black),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)))),
               ),
@@ -47,12 +58,22 @@ class _LoginPageState extends State<LoginPage> {
               height: 40,
               width: 300,
               child: TextField(
-                controller: _passwordController,
+                obscureText: obsecureText,
+                controller: passwordController,
                 decoration: InputDecoration(
-                    suffixIcon: Icon(
+                    prefixIcon: Icon(
                       Icons.lock,
                       color: Colors.black,
                     ),
+                    suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            obsecureText = !obsecureText;
+                          });
+                        },
+                        icon: Icon(obsecureText
+                            ? Icons.visibility_off
+                            : Icons.visibility)),
                     contentPadding: EdgeInsets.only(top: 10, left: 20),
                     hintText: 'password',
                     border: OutlineInputBorder(
@@ -64,19 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                     shape: MaterialStatePropertyAll(RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10))))),
                 onPressed: () {
-                  if (_emailController.text.isEmpty ||
-                      _passwordController.text.isEmpty) {
-                    const snackdemo = SnackBar(
-                      content: Text('Please Check your Email and Password'),
-                      backgroundColor: Color.fromARGB(255, 4, 4, 4),
-                      elevation: 10,
-                      behavior: SnackBarBehavior.floating,
-                      margin: EdgeInsets.all(5),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackdemo);
-                  } else {
-                    _signInWithEmailAndPassword();
-                  }
+                  check();
                 },
                 child: Container(
                     height: 40,
@@ -96,12 +105,21 @@ class _LoginPageState extends State<LoginPage> {
               child: Row(
                 children: [
                   Text('Dont have an account?  '),
-                  Text(
-                    'Signup',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignUpPage(),
+                          ));
+                    },
+                    child: Text(
+                      'Signup',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline),
+                    ),
                   )
                 ],
               ),
@@ -117,9 +135,16 @@ class _LoginPageState extends State<LoginPage> {
             ),
             Row(
               children: [
-                InkWell(
+                GestureDetector(
                   onTap: () {
-                    Provider.of<Signup>(context).signInWithGoogle(context);
+                    final data =
+                        Provider.of<fetchDatas>(context, listen: false);
+
+                    data.signInWithGoogle(context);
+                    if (auth.currentUser != null) {
+                      data.SaveWishlist();
+                      data.saveOrderDetails();
+                    }
                   },
                   child: Container(
                     margin: EdgeInsets.only(
@@ -128,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: 40,
                     decoration: BoxDecoration(
                         image: DecorationImage(
-                            image: AssetImage('assets/images/123456.png')),
+                            image: AssetImage('assets/images/google.png')),
                         color: Colors.white,
                         borderRadius: BorderRadius.all(Radius.circular(20))),
                   ),
@@ -141,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: 40,
                     decoration: BoxDecoration(
                         image: DecorationImage(
-                            image: AssetImage('assets/images/download (1).png'),
+                            image: AssetImage('assets/images/facebook.png'),
                             fit: BoxFit.cover),
                         color: Colors.white,
                         borderRadius: BorderRadius.all(Radius.circular(20))),
@@ -152,6 +177,8 @@ class _LoginPageState extends State<LoginPage> {
                   height: 40,
                   width: 40,
                   decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage('assets/images/download (5).png')),
                       color: Colors.white,
                       borderRadius: BorderRadius.all(Radius.circular(20))),
                 ),
@@ -163,32 +190,55 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  void check() {
+    final data = Provider.of<fetchDatas>(context, listen: false);
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      const snackdemo = SnackBar(
+        content: Text('Please Check your Email and Password'),
+        backgroundColor: Color.fromARGB(255, 4, 4, 4),
+        elevation: 10,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(5),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackdemo);
+    } else {
+      print('suuuuuuuuuuuiiiiiiiiiiiii');
 
-  void _signInWithEmailAndPassword() async {
+      signInWithEmailAndPassword();
+      FirebaseAuth auth = FirebaseAuth.instance;
+      User? user = auth.currentUser;
+      if (user != null) {
+        data.saveUserData();
+      }
+    }
+  }
+
+  void signInWithEmailAndPassword() async {
+    final data = Provider.of<fetchDatas>(context, listen: false);
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+        email: emailController.text,
+        password: passwordController.text,
       );
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => Navigators(),
           ));
-
+      data.addNotification('${emailController.text} Successfully Logined');
       print('User signed in: ${userCredential.user!.uid}');
       // Navigate to the next screen or perform necessary actions upon successful login
     } catch (e) {
+      const snack = SnackBar(
+        content: Text('Please Check your Email and Password and Try Again'),
+        backgroundColor: Color.fromARGB(255, 4, 4, 4),
+        elevation: 10,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(5),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snack);
       print('Failed to sign in: $e');
       // Handle error: show a snackbar, dialog, or display an error message
     }
   }
-}
-
-final FirebaseAuth _auth = FirebaseAuth.instance;
-
-void Signout() {
-  _auth.signOut();
 }

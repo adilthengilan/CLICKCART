@@ -1,8 +1,10 @@
 import 'package:clickcart/cart.dart';
-import 'package:clickcart/favorites.dart';
+import 'package:clickcart/functions/provider.dart';
+import 'package:clickcart/notification.dart';
 import 'package:clickcart/home.dart';
 import 'package:clickcart/profile.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class Navigators extends StatefulWidget {
@@ -13,22 +15,22 @@ class Navigators extends StatefulWidget {
 }
 
 class _NavigatorsState extends State<Navigators> {
-  var _currentIndex = 0;
   final List<Widget> _screens = [
     Dashboard(),
     cart(),
-    Likes(),
+    Notifications(),
     Profile() // Add more screens as needed
   ];
 
   @override
   Widget build(BuildContext context) {
+    final data = Provider.of<fetchDatas>(context);
     return Scaffold(
       bottomNavigationBar: SalomonBottomBar(
-        currentIndex: _currentIndex,
+        currentIndex: data.BottomBarIndex,
         onTap: (int index) {
           setState(() {
-            _currentIndex = index;
+            data.BottomBarIndex = index;
           });
         },
         items: [
@@ -48,7 +50,26 @@ class _NavigatorsState extends State<Navigators> {
 
           /// Search
           SalomonBottomBarItem(
-            icon: Icon(Icons.notifications),
+            icon: Stack(children: [
+              Icon(Icons.notifications),
+              Padding(
+                padding: EdgeInsets.only(left: 18),
+                child: Container(
+                  child: Center(
+                    child: Text(
+                      '${data.Notifications.length}',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  height: 10,
+                  width: 10,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(5))),
+                ),
+              )
+            ]),
             title: Text("Notifications"),
             selectedColor: Colors.orange,
           ),
@@ -61,8 +82,8 @@ class _NavigatorsState extends State<Navigators> {
           ),
         ],
       ),
-      backgroundColor: Color.fromARGB(255, 249, 244, 244),
-      body: _screens[_currentIndex],
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      body: _screens[data.BottomBarIndex],
     );
   }
 }
