@@ -1,4 +1,5 @@
-import 'package:clickcart/functions/provider.dart';
+import 'package:clickcart/ViewModel/cart.dart';
+import 'package:clickcart/ViewModel/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -174,8 +175,8 @@ class _SignUpPageState extends State<SignUpPage> {
         email: email,
         password: password,
       );
-      Provider.of<fetchDatas>(context, listen: false).saveUserData();
-      SavePhoneNumber();
+      // Provider.of<CartProvider>(context, listen: false).saveItemtoCart();
+      // SavePhoneNumber();
       // On successful signup, you can navigate to the next screen or perform other actions.
       print('User signed up: ${userCredential.user!.uid}');
     } catch (e) {

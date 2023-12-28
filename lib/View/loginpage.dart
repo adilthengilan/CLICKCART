@@ -1,7 +1,11 @@
-import 'package:clickcart/dashboard.dart';
-import 'package:clickcart/functions/provider.dart';
-import 'package:clickcart/signupPage.dart';
-import 'package:clickcart/splashscreen.dart';
+import 'package:clickcart/View/dashboard.dart';
+import 'package:clickcart/View/signupPage.dart';
+import 'package:clickcart/View/splashscreen.dart';
+import 'package:clickcart/ViewModel/cart.dart';
+import 'package:clickcart/ViewModel/functions.dart';
+import 'package:clickcart/ViewModel/registration.dart';
+import 'package:clickcart/ViewModel/wishlist.dart';
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,6 +28,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final reg = Provider.of<RegistrationProvider>(context, listen: false);
+    final wishlist = Provider.of<WishListProvider>(context, listen: false);
+    final cart = Provider.of<CartProvider>(context, listen: false);
+
     final Screenheight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
@@ -137,14 +145,9 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    final data =
-                        Provider.of<fetchDatas>(context, listen: false);
-
-                    data.signInWithGoogle(context);
-                    if (auth.currentUser != null) {
-                      data.SaveWishlist();
-                      data.saveOrderDetails();
-                    }
+                    reg.signInWithGoogle(context);
+                    cart.createFieldinCart();
+                    wishlist.createWishListFields();
                   },
                   child: Container(
                     margin: EdgeInsets.only(
@@ -191,7 +194,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void check() {
-    final data = Provider.of<fetchDatas>(context, listen: false);
+    final cart = Provider.of<CartProvider>(context, listen: false);
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       const snackdemo = SnackBar(
         content: Text('Please Check your Email and Password'),
@@ -205,11 +208,9 @@ class _LoginPageState extends State<LoginPage> {
       print('suuuuuuuuuuuiiiiiiiiiiiii');
 
       signInWithEmailAndPassword();
-      FirebaseAuth auth = FirebaseAuth.instance;
-      User? user = auth.currentUser;
-      if (user != null) {
-        data.saveUserData();
-      }
+      cart.createFieldinCart();
+      Provider.of<WishListProvider>(context, listen: false)
+          .createWishListFields();
     }
   }
 
@@ -225,7 +226,6 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(
             builder: (context) => Navigators(),
           ));
-      data.addNotification('${emailController.text} Successfully Logined');
       print('User signed in: ${userCredential.user!.uid}');
       // Navigate to the next screen or perform necessary actions upon successful login
     } catch (e) {

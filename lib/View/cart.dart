@@ -1,4 +1,9 @@
-import 'package:clickcart/functions/provider.dart';
+import 'package:clickcart/Model/collections.dart';
+import 'package:clickcart/ViewModel/cart.dart';
+import 'package:clickcart/ViewModel/fetchDataFromFirebase.dart';
+import 'package:clickcart/ViewModel/functions.dart';
+import 'package:clickcart/ViewModel/indexfinder.dart';
+import 'package:clickcart/ViewModel/reminder.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,7 +11,9 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class cart extends StatefulWidget {
-  const cart({super.key});
+  cart({
+    super.key,
+  });
 
   @override
   State<cart> createState() => _cartState();
@@ -17,11 +24,16 @@ class _cartState extends State<cart> {
     super.initState();
   }
 
+  Collections collections = Collections();
+  Reminder reminder = Reminder();
+  IndexFinder indexFinder = IndexFinder();
+
   final BoldStyle = TextStyle(fontWeight: FontWeight.w600);
   @override
   Widget build(BuildContext context) {
-    final data = Provider.of<fetchDatas>(context, listen: false);
-    data.fetchDataFromFirestore();
+    final data = Provider.of<FirebaseProvider>(context, listen: false);
+    final inCart = Provider.of<CartProvider>(context);
+    // data.fetchDataFromFirestore();
     return Scaffold(
       bottomNavigationBar: BottomAppBar(
         child: Row(
@@ -39,7 +51,7 @@ class _cartState extends State<cart> {
                 child: Padding(
                   padding: EdgeInsets.only(top: 6, left: 5),
                   child: Text(
-                    '\$${Provider.of<fetchDatas>(context).totalamount}',
+                    '\$${inCart.totalamount}',
                     style: TextStyle(fontSize: 27, fontWeight: FontWeight.w900),
                   ),
                 )),
@@ -51,11 +63,11 @@ class _cartState extends State<cart> {
                 width: 90,
                 child: TextButton(
                     onPressed: () {
-                      if (data.totalamount == 0) {
-                        data.showToast('Please add Products to cart');
+                      if (inCart.totalamount == 0) {
+                        reminder.showToast('Please add Products to cart');
                       } else {
-                        data.initiateRazorPay();
-                        data.startPayment(data.totalamount);
+                        inCart.initiateRazorPay();
+                        inCart.startPayment(inCart.totalamount);
                         addDateandTime(context);
                       }
                     },
@@ -73,8 +85,8 @@ class _cartState extends State<cart> {
         backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
-              if (data.BottomBarIndex == 1) {
-                data.BottomBarIndex = 0;
+              if (collections.BottomBarIndex == 1) {
+                collections.BottomBarIndex = 0;
               } else {
                 Navigator.pop(context);
               }
@@ -138,7 +150,7 @@ class _cartState extends State<cart> {
                               width: 260,
                             ),
                             Text(
-                              '${data.cartProduct.length} Items',
+                              ' Items',
                               style: BoldStyle,
                             )
                           ],
@@ -153,7 +165,7 @@ class _cartState extends State<cart> {
                               width: 200,
                             ),
                             Text(
-                              '\$${Provider.of<fetchDatas>(context).totalamount}',
+                              '\$${inCart.totalamount}',
                               style: BoldStyle,
                             )
                           ],
@@ -199,8 +211,7 @@ class _cartState extends State<cart> {
   void addDateandTime(BuildContext context) {
     final data = Provider.of<fetchDatas>(context, listen: false);
     DateTime now = DateTime.now();
-    data.TimeandDate = DateFormat('dd/MM/yyyy hh:mm:ss a').format(now);
-    print(data.TimeandDate);
+    collections.TimeandDate = DateFormat('dd/MM/yyyy hh:mm:ss a').format(now);
   }
 }
 
@@ -212,11 +223,14 @@ class Cartss extends StatefulWidget {
 }
 
 class _CartssState extends State<Cartss> {
+  Collections collections = Collections();
+  IndexFinder indexFinder = IndexFinder();
+  Reminder reminder = Reminder();
   @override
   Widget build(BuildContext context) {
     final FirebaseAuth auth = FirebaseAuth.instance;
     User? user = auth.currentUser;
-    final data = Provider.of<fetchDatas>(context, listen: false);
+    final data = Provider.of<CartProvider>(context, listen: false);
 
     return StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
@@ -225,12 +239,13 @@ class _CartssState extends State<Cartss> {
             .snapshots(),
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.hasData) {
-            List<dynamic> products = snapshot.data!.get('carts');
-            data.cartProduct = products;
+            data.products = snapshot.data!.get('carts');
+            data.totalamount = snapshot.data!.get('total');
+            List<dynamic> productId = snapshot.data!.get('Productid');
             return ListView.builder(
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: products.length,
+              itemCount: data.products.length,
               itemBuilder: (context, index) {
                 return InkWell(
                   onTap: () {
@@ -251,7 +266,7 @@ class _CartssState extends State<Cartss> {
                                 SizedBox(
                                     width: 200,
                                     child: Text(
-                                      products[index]['Name'],
+                                      data.products[index]['Name'],
                                       style: TextStyle(
                                           fontWeight: FontWeight.w700),
                                     )),
@@ -261,7 +276,7 @@ class _CartssState extends State<Cartss> {
                               margin: EdgeInsets.only(top: 5),
                               width: 300,
                               child: Text(
-                                data.products[index]['description'],
+                                data.products[index]['Description'],
                                 style:
                                     TextStyle(fontSize: 13, color: Colors.grey),
                               ),
@@ -270,7 +285,7 @@ class _CartssState extends State<Cartss> {
                               margin: EdgeInsets.only(top: 10),
                               width: 220,
                               child: Text(
-                                '${data.products[index]['discountPercentage']}% off',
+                                '${data.products[index]['Discount']}% off',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     color: Colors.green),
@@ -282,8 +297,8 @@ class _CartssState extends State<Cartss> {
                                   children: [
                                     InkWell(
                                       onTap: () {
-                                        data.findProductIndex(
-                                            data.cartProduct[index]['Name']);
+                                        // indexFinder.findProductIndex(collections
+                                        //     .cartProduct[index]['Name']);
                                       },
                                       child: Container(
                                         child: Center(
@@ -341,7 +356,7 @@ class _CartssState extends State<Cartss> {
                               Padding(
                                 padding: EdgeInsets.only(top: 30),
                                 child: Text(
-                                  '\$${products[index]['Price']}',
+                                  '\$${data.products[index]['Price']}',
                                   style: TextStyle(
                                       fontSize: 21,
                                       fontWeight: FontWeight.w800,
@@ -352,9 +367,14 @@ class _CartssState extends State<Cartss> {
                                 padding: EdgeInsets.only(left: 150, top: 10),
                                 child: IconButton(
                                     onPressed: () {
-                                      data.findProductIndex(
-                                          products[index]['Name']);
-                                      data.removeItemFromCart();
+                                      data.removeItemFromCart(
+                                          data.products[index]['Name'],
+                                          data.products[index]['Price'],
+                                          data.products[index]['Image'],
+                                          data.products[index]['Rating'],
+                                          productId[index]['id'],
+                                          data.products[index]['Description'],
+                                          data.products[index]['Discount']);
                                     },
                                     icon: Image.asset(
                                         'assets/images/deleteIcon.png')),
@@ -375,8 +395,8 @@ class _CartssState extends State<Cartss> {
                       margin: EdgeInsets.only(top: 5),
                       decoration: BoxDecoration(
                           image: DecorationImage(
-                              image:
-                                  NetworkImage('${products[index]['Image']}'),
+                              image: NetworkImage(
+                                  '${data.products[index]['Image']}'),
                               fit: BoxFit.fill),
                           color: const Color.fromARGB(255, 203, 199, 199),
                           borderRadius: BorderRadius.all(Radius.circular(10))),

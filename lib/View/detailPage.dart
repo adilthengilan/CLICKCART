@@ -1,5 +1,10 @@
-import 'package:clickcart/cart.dart';
-import 'package:clickcart/functions/provider.dart';
+import 'package:clickcart/Model/collections.dart';
+import 'package:clickcart/Model/productDetails.dart';
+import 'package:clickcart/ViewModel/cart.dart';
+import 'package:clickcart/ViewModel/fetchDataFromFirebase.dart';
+import 'package:clickcart/ViewModel/functions.dart';
+import 'package:clickcart/ViewModel/wishlist.dart';
+import 'package:clickcart/view/cart.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +12,26 @@ import 'package:provider/provider.dart';
 import 'package:card_swiper/card_swiper.dart';
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({super.key});
+  String Name;
+  int Price;
+  double Rating;
+  String Description;
+  String Brand;
+  String Category;
+  double Discount;
+  int Stock;
+  List<String> Images;
+  DetailPage(
+      {super.key,
+      required this.Name,
+      required this.Price,
+      required this.Rating,
+      required this.Description,
+      required this.Images,
+      required this.Brand,
+      required this.Category,
+      required this.Discount,
+      required this.Stock});
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -16,22 +40,25 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   bool onPressed = false;
   final controller = PageController();
+  Products? obj;
 
   @override
   Widget build(BuildContext context) {
+    print('==================================================${widget.Images}');
     final ScreenWidth = MediaQuery.of(context).size.width;
     final ScreenHeight = MediaQuery.of(context).size.height;
     List<dynamic> images = [];
+    Collections collections = Collections();
+    // final data = Provider.of<FirebaseProvider>(context);
+    // final wishlist = Provider.of<WishListProvider>(context);
+    // final Incart = Provider.of<CartProvider>(context);
+    // data.fetchDataFromFirestore();
 
-    final data = Provider.of<fetchDatas>(context);
-    data.fetchDataFromFirestore();
-    data.FromFirestore();
-
-    bool isInWishlist =
-        data.WishlistIds.contains(data.products[data.currentindex]['id']);
-    bool isinCart =
-        data.cartProductid.contains(data.products[data.currentindex]['id']);
-    images = data.products[data.currentindex]['images'];
+    // bool isInWishlist = collections.WishlistIds.contains(
+    //     collections.products[collections.currentindex]['id']);
+    // bool isinCart = collections.cartProductid
+    //     .contains(collections.products[collections.currentindex]['id']);
+    images = widget.Images;
 
     return SafeArea(
       child: Scaffold(
@@ -45,13 +72,13 @@ class _DetailPageState extends State<DetailPage> {
               ),
               InkWell(
                 onTap: () {
-                  isinCart
-                      ? Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => cart(),
-                          ))
-                      : data.saveUserData();
+                  // isinCart
+                  //     ? Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => cart(),
+                  //         ))
+                  //     : Incart.saveItemtoCart();
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -59,23 +86,23 @@ class _DetailPageState extends State<DetailPage> {
                       borderRadius: BorderRadius.all(Radius.circular(30))),
                   height: 40,
                   width: 130,
-                  child: Center(
-                    child: isinCart
-                        ? Text(
-                            'Go to Cart',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18),
-                          )
-                        : Text(
-                            'Add to Cart',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18),
-                          ),
-                  ),
+                  // child: Center(
+                  //   child: isinCart
+                  //       ? Text(
+                  //           'Go to Cart',
+                  //           style: TextStyle(
+                  //               color: Colors.white,
+                  //               fontWeight: FontWeight.w700,
+                  //               fontSize: 18),
+                  //         )
+                  //       : Text(
+                  //           'Add to Cart',
+                  //           style: TextStyle(
+                  //               color: Colors.white,
+                  //               fontWeight: FontWeight.w700,
+                  //               fontSize: 18),
+                  //         ),
+                  // ),
                 ),
               )
             ],
@@ -214,23 +241,23 @@ class _DetailPageState extends State<DetailPage> {
                             left: MediaQuery.of(context).size.width / 1.4),
                         child: GestureDetector(
                           onTap: () {
-                            isInWishlist
-                                ? data.removeItemFromeWishlist()
-                                : data.SaveWishlist();
+                            // isInWishlist
+                            //     ? wishlist.removeItemFromeWishlist()
+                            //     : wishlist.SaveWishlist();
                           },
                           child: CircleAvatar(
                             radius: 20,
                             backgroundColor: Colors.white,
-                            child: Center(
-                              child: isInWishlist
-                                  ? Icon(
-                                      Icons.favorite,
-                                      color: Colors.red,
-                                    )
-                                  : Icon(
-                                      Icons.favorite_border,
-                                    ),
-                            ),
+                            // child: Center(
+                            //   child: isInWishlist
+                            //       ? Icon(
+                            //           Icons.favorite,
+                            //           color: Colors.red,
+                            //         )
+                            //       : Icon(
+                            //           Icons.favorite_border,
+                            //         ),
+                            // ),
                           ),
                         ),
                       ),
@@ -255,7 +282,7 @@ class _DetailPageState extends State<DetailPage> {
                             color: Colors.yellow,
                           ),
                           Text(
-                            '${data.products[data.currentindex]['rating']}',
+                            '${widget.Rating}',
                             style: TextStyle(fontWeight: FontWeight.w700),
                           )
                         ],
@@ -306,22 +333,22 @@ class _DetailPageState extends State<DetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${data.products[data.currentindex]['title']}',
+                              '${widget.Name}',
                               style: TextStyle(
                                   fontSize: 25, fontWeight: FontWeight.w900),
                             ),
                             SizedBox(
                               height: 40,
                             ),
+                            // Text(
+                            //   '${collections.products[collections.currentindex]['discountPercentage']}% off',
+                            //   style: TextStyle(
+                            //       fontSize: 18,
+                            //       color: Colors.green,
+                            //       fontWeight: FontWeight.w600),
+                            // ),
                             Text(
-                              '${data.products[data.currentindex]['discountPercentage']}% off',
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                            Text(
-                              '\$${data.products[data.currentindex]['price']}',
+                              '\$${widget.Price}',
                               style: TextStyle(
                                   fontSize: 26, fontWeight: FontWeight.w700),
                             )
@@ -349,25 +376,25 @@ class _DetailPageState extends State<DetailPage> {
                                   fontSize: 20, fontWeight: FontWeight.w700),
                             ),
                             Text(
-                              'Brand : ${data.products[data.currentindex]['brand']}',
+                              'Brand : ${widget.Brand}',
                               style: style,
                             ),
                             Text(
-                              'Category : ${data.products[data.currentindex]['category']}',
-                              style: style,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              'Description : ${data.products[data.currentindex]['description']}',
+                              'Category : ${widget.Category}',
                               style: style,
                             ),
                             SizedBox(
                               height: 10,
                             ),
                             Text(
-                              'Available : ${data.products[data.currentindex]['stock']} Pieces only.!',
+                              'Description : ${widget.Description}}',
+                              style: style,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              'Available : ${widget.Stock} Pieces only.!',
                               style: style,
                             )
                           ],

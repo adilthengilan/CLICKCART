@@ -1,8 +1,10 @@
-import 'package:clickcart/functions/provider.dart';
-import 'package:clickcart/loginpage.dart';
-import 'package:clickcart/wishlist.dart';
-import 'package:clickcart/yourOrderList.dart';
-import 'package:clickcart/splashscreen.dart';
+import 'package:clickcart/View/loginpage.dart';
+import 'package:clickcart/View/splashscreen.dart';
+import 'package:clickcart/View/wishlist.dart';
+import 'package:clickcart/View/yourOrderList.dart';
+import 'package:clickcart/ViewModel/functions.dart';
+import 'package:clickcart/ViewModel/registration.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -255,7 +257,7 @@ class _ProfileState extends State<Profile> {
                                   actions: [
                                     TextButton(
                                         onPressed: () {
-                                          Provider.of<fetchDatas>(context,
+                                          Provider.of<RegistrationProvider>(context,
                                                   listen: false)
                                               .signOutUser(context);
                                           Navigator.pushAndRemoveUntil(

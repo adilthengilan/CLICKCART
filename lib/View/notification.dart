@@ -1,4 +1,5 @@
-import 'package:clickcart/functions/provider.dart';
+import 'package:clickcart/Model/collections.dart';
+import 'package:clickcart/ViewModel/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,7 @@ class _NotificationsState extends State<Notifications> {
     Loaddata(context);
   }
 
+  Collections collections = Collections();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,19 +55,19 @@ class _NotificationsState extends State<Notifications> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     await pref.clear();
     setState(() {
-      data.Notifications = [];
+      collections.Notifications = [];
     });
   }
 }
 
 class NotifyList extends StatelessWidget {
-  const NotifyList({super.key});
-
+   NotifyList({super.key});
+  Collections collections = Collections();
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<fetchDatas>(context);
     return ListView.builder(
-      itemCount: data.Notifications.length,
+      itemCount: collections.Notifications.length,
       itemBuilder: (context, index) {
         return Container(
           decoration: BoxDecoration(
@@ -76,7 +78,7 @@ class NotifyList extends StatelessWidget {
           width: 390,
           child: ListTile(
             title: Text(
-              data.Notifications[index],
+              collections.Notifications[index],
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
             ),
             leading: Container(
@@ -93,6 +95,6 @@ class NotifyList extends StatelessWidget {
   void savedata(BuildContext context) async {
     final data = Provider.of<fetchDatas>(context);
     final SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setStringList('Notificaion', data.Notifications);
+    pref.setStringList('Notificaion', collections.Notifications);
   }
 }

@@ -1,8 +1,10 @@
-import 'package:clickcart/cart.dart';
-import 'package:clickcart/functions/provider.dart';
-import 'package:clickcart/notification.dart';
-import 'package:clickcart/home.dart';
-import 'package:clickcart/profile.dart';
+import 'package:clickcart/Model/collections.dart';
+import 'package:clickcart/View/home.dart';
+import 'package:clickcart/View/notification.dart';
+import 'package:clickcart/View/profile.dart';
+import 'package:clickcart/ViewModel/functions.dart';
+
+import 'package:clickcart/view/cart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
@@ -15,6 +17,8 @@ class Navigators extends StatefulWidget {
 }
 
 class _NavigatorsState extends State<Navigators> {
+  Collections collections = Collections();
+
   final List<Widget> _screens = [
     Dashboard(),
     cart(),
@@ -27,10 +31,10 @@ class _NavigatorsState extends State<Navigators> {
     final data = Provider.of<fetchDatas>(context);
     return Scaffold(
       bottomNavigationBar: SalomonBottomBar(
-        currentIndex: data.BottomBarIndex,
+        currentIndex: collections.BottomBarIndex,
         onTap: (int index) {
           setState(() {
-            data.BottomBarIndex = index;
+            collections.BottomBarIndex = index;
           });
         },
         items: [
@@ -57,7 +61,7 @@ class _NavigatorsState extends State<Navigators> {
                 child: Container(
                   child: Center(
                     child: Text(
-                      '${data.Notifications.length}',
+                      '${collections.Notifications.length}',
                       style:
                           TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
                     ),
@@ -83,7 +87,7 @@ class _NavigatorsState extends State<Navigators> {
         ],
       ),
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
-      body: _screens[data.BottomBarIndex],
+      body: _screens[collections.BottomBarIndex],
     );
   }
 }

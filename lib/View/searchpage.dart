@@ -1,5 +1,7 @@
-import 'package:clickcart/detailPage.dart';
-import 'package:clickcart/functions/provider.dart';
+import 'package:clickcart/Model/collections.dart';
+import 'package:clickcart/View/detailPage.dart';
+import 'package:clickcart/ViewModel/filter.dart';
+import 'package:clickcart/ViewModel/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +13,9 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+    Collections collections = Collections();
+    Filter filter = Filter();
+
   final TextEditingController Searchcontroller = TextEditingController();
 
   @override
@@ -28,7 +33,7 @@ class _SearchPageState extends State<SearchPage> {
               width: MediaQuery.of(context).size.width / 1.11,
               child: TextField(
                 onChanged: (value) {
-                  data.filterProducts(value);
+                  filter.filterProducts(value);
                 },
                 decoration: InputDecoration(
                     prefixIcon: Icon(Icons.search),
@@ -66,31 +71,32 @@ class SearchList extends StatefulWidget {
 }
 
 class _SearchListState extends State<SearchList> {
+  Collections collections = Collections();
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<fetchDatas>(context);
 
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: data.filteredProducts.length,
+      itemCount: collections.filteredProducts.length,
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
-            data.currentindex = index;
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DetailPage(),
-                ));
+            collections.currentindex = index;
+            // Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => DetailPage(),
+            //     ));
           },
           child: ListTile(
-            title: Text(data.filteredProducts[index]['title']),
-            subtitle: Text('\$${data.filteredProducts[index]['price']}'),
+            title: Text(collections.filteredProducts[index]['title']),
+            subtitle: Text('\$${collections.filteredProducts[index]['price']}'),
             leading: Container(
                 height: 50,
                 width: 50,
                 child:
-                    Image.network(data.filteredProducts[index]['thumbnail'])),
+                    Image.network(collections.filteredProducts[index]['thumbnail'])),
           ),
         );
       },
