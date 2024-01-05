@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:clickcart/View/dashboard.dart';
 import 'package:clickcart/View/loginpage.dart';
 import 'package:connectivity/connectivity.dart';
-
 import 'package:clickcart/ViewModel/functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<fetchDatas>(context).fetchData();
+    Provider.of<fetchDatas>(context);
 
     return Scaffold(
       body: Center(

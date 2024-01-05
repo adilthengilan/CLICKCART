@@ -1,5 +1,4 @@
 import 'package:clickcart/Model/collections.dart';
-import 'package:clickcart/Model/productDetails.dart';
 import 'package:clickcart/ViewModel/fetchDataFromFirebase.dart';
 import 'package:clickcart/ViewModel/functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -107,7 +106,7 @@ class Orderlist extends StatelessWidget {
                           ListView.builder(
                             physics: NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
-                            itemCount: collections.Orders.length,
+                            itemCount: Orders.length,
                             itemBuilder: (context, index) {
                               return ListTile(
                                 title: Text(Orders[index]['Name']),

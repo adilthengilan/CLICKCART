@@ -1,9 +1,10 @@
-
 import 'package:clickcart/View/splashscreen.dart';
-import 'package:clickcart/ViewModel/cart.dart';
+import 'package:clickcart/ViewModel/cart_controller.dart';
 import 'package:clickcart/ViewModel/fetchDataFromFirebase.dart';
 import 'package:clickcart/ViewModel/functions.dart';
+import 'package:clickcart/ViewModel/indexfinder.dart';
 import 'package:clickcart/ViewModel/registration.dart';
+import 'package:clickcart/ViewModel/search_controller.dart';
 import 'package:clickcart/ViewModel/wishlist.dart';
 import 'package:clickcart/firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,11 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => FirebaseProvider(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (context) => IndexFinder(),
+        ),
+        ChangeNotifierProvider(create: (context) => FilterProvider(),)
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

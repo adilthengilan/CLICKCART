@@ -1,6 +1,5 @@
 import 'package:clickcart/Model/collections.dart';
 import 'package:clickcart/View/detailPage.dart';
-import 'package:clickcart/ViewModel/filter.dart';
 import 'package:clickcart/ViewModel/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,14 +12,13 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-    Collections collections = Collections();
-    Filter filter = Filter();
+  Collections collections = Collections();
 
   final TextEditingController Searchcontroller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final data = Provider.of<fetchDatas>(context);
+    final filter = Provider.of<fetchDatas>(context);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 249, 244, 244),
       resizeToAvoidBottomInset: false,
@@ -33,7 +31,7 @@ class _SearchPageState extends State<SearchPage> {
               width: MediaQuery.of(context).size.width / 1.11,
               child: TextField(
                 onChanged: (value) {
-                  filter.filterProducts(value);
+                  filter.filtering(value);
                 },
                 decoration: InputDecoration(
                     prefixIcon: Icon(Icons.search),
@@ -45,8 +43,8 @@ class _SearchPageState extends State<SearchPage> {
               )),
           SizedBox(
             child: SearchList(),
-            height: 600,
-            width: 300,
+            height: MediaQuery.of(context).size.height / 1.2,
+            width: double.infinity,
           )
         ],
       ),
@@ -71,32 +69,53 @@ class SearchList extends StatefulWidget {
 }
 
 class _SearchListState extends State<SearchList> {
-  Collections collections = Collections();
+  Collections filter = Collections();
   @override
   Widget build(BuildContext context) {
-    final data = Provider.of<fetchDatas>(context);
+    final filter = Provider.of<fetchDatas>(context);
 
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: collections.filteredProducts.length,
+      itemCount: filter.filteredProducts.length,
       itemBuilder: (context, index) {
+        final filters = filter.filteredProducts[index];
         return GestureDetector(
           onTap: () {
-            collections.currentindex = index;
+            // collections.currentindex = index;
             // Navigator.push(
             //     context,
             //     MaterialPageRoute(
             //       builder: (context) => DetailPage(),
             //     ));
           },
-          child: ListTile(
-            title: Text(collections.filteredProducts[index]['title']),
-            subtitle: Text('\$${collections.filteredProducts[index]['price']}'),
-            leading: Container(
-                height: 50,
-                width: 50,
-                child:
-                    Image.network(collections.filteredProducts[index]['thumbnail'])),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailPage(
+                        Name: filters.title,
+                        Price: filters.price,
+                        Rating: filters.rating,
+                        Description: filters.description,
+                        Brand: filters.brand,
+                        Category: filters.category,
+                        Discount: filters.discountPercentage,
+                        Stock: filters.stock,
+                        id: filters.id,
+                        thumbnail: filters.thumbnail,
+                        Images: filters.images),
+                  ));
+            },
+            child: ListTile(
+              title: Text(filter.filteredProducts[index].title),
+              subtitle: Text('\$${filter.filteredProducts[index].price}'),
+              leading: Container(
+                  height: 50,
+                  width: 50,
+                  child:
+                      Image.network(filter.filteredProducts[index].thumbnail)),
+            ),
           ),
         );
       },

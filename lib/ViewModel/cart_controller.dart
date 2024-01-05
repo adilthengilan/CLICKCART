@@ -7,9 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class CartProvider extends ChangeNotifier {
-  int totalamount = 0;
+  int totalprices = 0;
   String DateandTime = '';
-  List<dynamic> products = [];
+  List<dynamic> Cartproducts = [];
   Collections collections = Collections();
 
   final Razorpay _razorpay = Razorpay();
@@ -22,24 +22,48 @@ class CartProvider extends ChangeNotifier {
   ///THE LIST WHEN PRODUCTS WAS ADDED TO THE CART.
   ///
 
-  Future<void> createFieldinCart() async {
+  // Future<void> createFieldinCart() async {
+  //   if (auth.currentUser != null) {
+  //     String userId = auth.currentUser!.uid;
+  //     // Reference to the collection 'users' in Firestore
+  //     final users = FirebaseFirestore.instance.collection('users').doc(userId);
+  //     // final userssnap = await users.get();
+  //     // Replace 'userData' with the document name or ID
+  //     // Here, a new document will be created with the user ID
+
+  //     // if (!userssnap.exists) {}
+  //     notifyListeners();
+  //   }
+  // }
+  Future<void> getTotalAmount() async {
+    final user = FirebaseFirestore.instance
+        .collection('users')
+        .doc(auth.currentUser!.uid);
+
+    final total = await user.get();
+    totalprices = total['total'];
+    print(totalprices);
+    notifyListeners();
+  }
+
+  Future<void> createFieldinFirebase() async {
     if (auth.currentUser != null) {
       String userId = auth.currentUser!.uid;
-      // Reference to the collection 'users' in Firestore
       final users = FirebaseFirestore.instance.collection('users').doc(userId);
+
       final userssnap = await users.get();
-      // Replace 'userData' with the document name or ID
-      // Here, a new document will be created with the user ID
+
       if (!userssnap.exists) {
         await users.set({
           'carts': [],
           'total': 0,
           'Productid': [],
+          'wishlist': [],
+          'yourOrders': []
 
           // Add more fields as needed
         });
       }
-      notifyListeners();
     }
   }
 
@@ -52,11 +76,13 @@ class CartProvider extends ChangeNotifier {
         // Reference to the collection 'users' in Firestore
         final users =
             FirebaseFirestore.instance.collection('users').doc(userId);
+
         final userssnap = await users.get();
         // Replace 'userData' with the document name or ID
         // Here, a new document will be created with the user ID
+
         if (userssnap.exists) {
-          int totalprices = userssnap['total'] + Price;
+          int totalamount = userssnap['total'] + Price;
           await users.update({
             'carts': FieldValue.arrayUnion([
               {
@@ -68,7 +94,7 @@ class CartProvider extends ChangeNotifier {
                 'Discount': Discount
               }
             ]),
-            'total': totalprices,
+            'total': totalamount,
             'Productid': FieldValue.arrayUnion([id]),
 
             // Add more fields as needed
@@ -124,15 +150,15 @@ class CartProvider extends ChangeNotifier {
     if (auth.currentUser != null) {
       String userId = auth.currentUser!.uid;
       final users = FirebaseFirestore.instance.collection('users').doc(userId);
-      final userssnap = await users.get();
+      // final userssnap = await users.get();
+      await users.set({
+        'YourOrders': [],
 
-      if (!userssnap.exists) {
-        await users.set({
-          'YourOrders': [],
+        // Add more fields as needed
+      });
+      // if (!userssnap.exists) {
 
-          // Add more fields as needed
-        });
-      }
+      // }
     }
   }
 
@@ -192,7 +218,7 @@ class CartProvider extends ChangeNotifier {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    saveOrderDetails(DateandTime, totalamount, products);
+    saveOrderDetails(DateandTime, totalprices, Cartproducts);
     CleanCart();
 
 // Do something when payment succeeds

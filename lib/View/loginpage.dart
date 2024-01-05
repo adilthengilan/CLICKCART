@@ -1,7 +1,6 @@
 import 'package:clickcart/View/dashboard.dart';
 import 'package:clickcart/View/signupPage.dart';
-import 'package:clickcart/View/splashscreen.dart';
-import 'package:clickcart/ViewModel/cart.dart';
+import 'package:clickcart/ViewModel/cart_controller.dart';
 import 'package:clickcart/ViewModel/functions.dart';
 import 'package:clickcart/ViewModel/registration.dart';
 import 'package:clickcart/ViewModel/wishlist.dart';
@@ -145,9 +144,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    reg.signInWithGoogle(context);
-                    cart.createFieldinCart();
-                    wishlist.createWishListFields();
+                    cart.createFieldinFirebase();
                   },
                   child: Container(
                     margin: EdgeInsets.only(
@@ -194,7 +191,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void check() {
-    final cart = Provider.of<CartProvider>(context, listen: false);
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       const snackdemo = SnackBar(
         content: Text('Please Check your Email and Password'),
@@ -208,9 +204,6 @@ class _LoginPageState extends State<LoginPage> {
       print('suuuuuuuuuuuiiiiiiiiiiiii');
 
       signInWithEmailAndPassword();
-      cart.createFieldinCart();
-      Provider.of<WishListProvider>(context, listen: false)
-          .createWishListFields();
     }
   }
 
@@ -227,6 +220,8 @@ class _LoginPageState extends State<LoginPage> {
             builder: (context) => Navigators(),
           ));
       print('User signed in: ${userCredential.user!.uid}');
+      Provider.of<CartProvider>(context, listen: false).createFieldinFirebase();
+
       // Navigate to the next screen or perform necessary actions upon successful login
     } catch (e) {
       const snack = SnackBar(

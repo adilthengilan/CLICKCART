@@ -6,24 +6,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class WishListProvider extends ChangeNotifier {
   Collections Keys = Collections();
   FirebaseAuth auth = FirebaseAuth.instance;
-  List<dynamic> WishlistProducts = [];
-  Future<void> createWishListFields() async {
-    if (auth.currentUser != null) {
-      String userId = auth.currentUser!.uid;
 
-      // Reference to the collection 'users' in Firestore
-      final users = FirebaseFirestore.instance.collection('users').doc(userId);
-      final userssnap = await users.get();
-      if (!userssnap.exists) {
-        await users.set({
-          'wishlist': [],
-          'wishlistId': []
-          // Add more fields as needed
-        });
-      }
-      notifyListeners();
-    }
-  }
+  List<dynamic> WishlistProducts = [];
+  // Future<void> createWishListFields() async {
+  //   if (auth.currentUser != null) {
+  //     String userId = auth.currentUser!.uid;
+
+  //     // Reference to the collection 'users' in Firestore
+  //     final users = FirebaseFirestore.instance.collection('users').doc(userId);
+  //     // final userssnap = await users.get();
+
+  //     // if (!userssnap.exists) {
+
+  //     // }
+  //     notifyListeners();
+  //   }
+  // }
 
   Future<void> SaveWishlist(String Name, int Price, String thumbnail,
       double Rating, int id, String Description, double Discount) async {
@@ -37,7 +35,11 @@ class WishListProvider extends ChangeNotifier {
         final userssnap = await users.get();
         // Replace 'userData' with the document name or ID
         // Here, a new document will be created with the user ID
-        if (userssnap.exists) {
+        if (!userssnap.exists) {
+          await users.set({
+            'wishlist': [], // Add more fields as needed
+          });
+        } else {
           await users.update({
             'wishlist': FieldValue.arrayUnion([
               {
@@ -46,14 +48,13 @@ class WishListProvider extends ChangeNotifier {
                 'Image': thumbnail,
                 'Rating': Rating,
                 'Description': Description,
-                'Discount': Discount
+                'Discount': Discount,
+                'id': id
               }
             ]),
             'WishlistProductId': FieldValue.arrayUnion([id])
             // Add more fields as needed
           });
-        } else {
-          print('');
         }
         notifyListeners();
         print('Data saved successfully for user ID: $userId');
@@ -79,13 +80,15 @@ class WishListProvider extends ChangeNotifier {
             'Name': Name,
             'Price': Price,
             'Image': thumbnail,
+            'Rating': Rating,
             'Discount': Discount,
-            'Description': Description
+            'Description': Description,
+            'id': id
           }
         ]),
-        'wishlistIds': FieldValue.arrayRemove([id])
+        'WishlistProductId': FieldValue.arrayRemove([id])
       });
-      // print('Item  removed from cart successfully$currentindex');
+      print('Item  removed from cart successfully');
     } catch (e) {
       print('Error removing item from cart: $e');
     }

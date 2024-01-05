@@ -1,10 +1,10 @@
 import 'package:clickcart/Model/collections.dart';
-import 'package:clickcart/View/home.dart';
+import 'package:clickcart/View/cartPage/cart.dart';
+import 'package:clickcart/View/homePage/landingPage.dart';
 import 'package:clickcart/View/notification.dart';
 import 'package:clickcart/View/profile.dart';
-import 'package:clickcart/ViewModel/functions.dart';
+import 'package:clickcart/ViewModel/indexfinder.dart';
 
-import 'package:clickcart/view/cart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
@@ -28,13 +28,13 @@ class _NavigatorsState extends State<Navigators> {
 
   @override
   Widget build(BuildContext context) {
-    final data = Provider.of<fetchDatas>(context);
+    final indexes = Provider.of<IndexFinder>(context);
     return Scaffold(
       bottomNavigationBar: SalomonBottomBar(
-        currentIndex: collections.BottomBarIndex,
+        currentIndex: indexes.BottomBarIndex,
         onTap: (int index) {
           setState(() {
-            collections.BottomBarIndex = index;
+            indexes.BottomBarIndex = index;
           });
         },
         items: [
@@ -87,7 +87,7 @@ class _NavigatorsState extends State<Navigators> {
         ],
       ),
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
-      body: _screens[collections.BottomBarIndex],
+      body: _screens[indexes.BottomBarIndex],
     );
   }
 }

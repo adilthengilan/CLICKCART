@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class RegistrationProvider extends ChangeNotifier {
-
-   final GoogleSignIn googleSignIn = GoogleSignIn();
+  final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   User? _user;
@@ -35,7 +34,6 @@ class RegistrationProvider extends ChangeNotifier {
         context,
         MaterialPageRoute(builder: (context) => Navigators()),
       );
-     
     } catch (error) {
       print("Google Sign-In Error: $error");
     }
@@ -51,6 +49,7 @@ class RegistrationProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
   //////////////////////////////////////////////////
   ///________THIS FUNCTION IS USED FOR SIGNOUT FROM THE APP.AND NAVIGATE
   ///TO THE LOGIN PAGE./////////////////////////////////
@@ -58,6 +57,7 @@ class RegistrationProvider extends ChangeNotifier {
     FirebaseAuth auth = FirebaseAuth.instance;
     try {
       await auth.signOut();
+      await googleSignIn.signOut();
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(

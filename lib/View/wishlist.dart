@@ -1,8 +1,6 @@
 import 'package:clickcart/Model/collections.dart';
-import 'package:clickcart/ViewModel/cart.dart';
+import 'package:clickcart/ViewModel/cart_controller.dart';
 import 'package:clickcart/ViewModel/fetchDataFromFirebase.dart';
-import 'package:clickcart/ViewModel/functions.dart';
-import 'package:clickcart/ViewModel/indexfinder.dart';
 import 'package:clickcart/ViewModel/reminder.dart';
 import 'package:clickcart/ViewModel/wishlist.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,14 +17,15 @@ class Likes extends StatefulWidget {
 
 class _LikesState extends State<Likes> {
   Collections collections = Collections();
-  IndexFinder indexFinder = IndexFinder();
-  Reminder reminder = Reminder();
+
   @override
   Widget build(BuildContext context) {
-    final data = Provider.of<FirebaseProvider>(context, listen: false);
+    final firebase = Provider.of<FirebaseProvider>(context, listen: false);
     final InCart = Provider.of<CartProvider>(context, listen: false);
+    final data = Provider.of<WishListProvider>(context);
+    Reminder reminder = Reminder();
+    double screenwidth = MediaQuery.of(context).size.width;
     // data.FromFirestore();
-    data.fetchDataFromFirestore();
 
     final FirebaseAuth _auth = FirebaseAuth.instance;
     User? user = _auth.currentUser;
@@ -50,160 +49,185 @@ class _LikesState extends State<Likes> {
       backgroundColor: Color.fromARGB(255, 242, 242, 242),
       body: Column(
         children: [
-          Consumer<WishListProvider>(builder: (context, data, child) {
-            return SizedBox(
-              height: MediaQuery.of(context).size.height / 1.429,
-              width: double.infinity,
-              child: StreamBuilder<DocumentSnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(user!.uid)
-                      .snapshots(),
-                  builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                    if (snapshot.hasData) {
-                      List<dynamic> WishlistProducts =
-                          snapshot.data!.get('wishlist');
-                      return ListView.builder(
-                        itemCount: WishlistProducts.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin:
-                                EdgeInsets.only(left: 15, right: 15, top: 5),
-                            height: 150,
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                color: Color.fromARGB(255, 255, 255, 255)),
-                            child: ListTile(
-                              title: Padding(
-                                padding: EdgeInsets.only(top: 10),
-                                child: Stack(children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 180),
-                                    child: InkWell(
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 1.149,
+            width: double.infinity,
+            child: StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(user!.uid)
+                    .snapshots(),
+                builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  if (snapshot.hasData) {
+                    data.WishlistProducts = snapshot.data!.get('wishlist');
+
+                    return ListView.builder(
+                      itemCount: data.WishlistProducts.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: EdgeInsets.only(left: 15, right: 15, top: 5),
+                          height: 150,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              color: Color.fromARGB(255, 255, 255, 255)),
+                          child: ListTile(
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 120,
+                                      child: Text(
+                                        data.WishlistProducts[index]['Name'],
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 20),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: screenwidth / 7,
+                                    ),
+                                    InkWell(
                                       onTap: () {
                                         data.removeItemFromeWishlist(
-                                            WishlistProducts[index]['Name'],
-                                            WishlistProducts[index]['Price'],
-                                            WishlistProducts[index]
-                                                ['thumbnail'],
-                                            WishlistProducts[index]['Rating'],
-                                            WishlistProducts[index]['id'],
-                                            WishlistProducts[index]
+                                            data.WishlistProducts[index]
+                                                ['Name'],
+                                            data.WishlistProducts[index]
+                                                ['Price'],
+                                            data.WishlistProducts[index]
+                                                ['Image'],
+                                            data.WishlistProducts[index]
+                                                ['Rating'],
+                                            data.WishlistProducts[index]['id'],
+                                            data.WishlistProducts[index]
                                                 ['Description'],
-                                            WishlistProducts[index]
+                                            data.WishlistProducts[index]
                                                 ['Discount']);
                                       },
                                       child: SizedBox(
-                                          height: 30,
-                                          width: 30,
-                                          child: Image.asset(
-                                              'assets/images/deleteIcon.png')),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 100,
-                                    width: 180,
-                                    child: Text(
-                                      WishlistProducts[index]['Name'],
+                                        height: 30,
+                                        width: 30,
+                                        child: Image.asset(
+                                            'assets/images/deleteIcon.png'),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  data.WishlistProducts[index]['Description'],
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
+                                SizedBox(
+                                  height: screenwidth / 20,
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      '\$${data.WishlistProducts[index]['Price']}',
                                       style: TextStyle(
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ]),
-                              ),
-                              subtitle: Row(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 0),
-                                    child: Text(
-                                      '\$${WishlistProducts[index]['Price']}',
-                                      style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: 20,
                                           fontWeight: FontWeight.w800,
                                           color: Colors.black),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 50,
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      indexFinder.findProductIndex(collections
-                                          .wishlistProduct[index]['Name']);
-                                      bool isinCart = collections.cartProductid
-                                          .contains(collections.products[
-                                              collections.currentindex]['id']);
-                                      isinCart
-                                          ? reminder.showToast(
-                                              'Product already in Cart')
-                                          : [
-                                              indexFinder.findProductIndex(
-                                                  collections.wishlistProduct[
-                                                      index]['Name']),
-                                              // InCart.saveItemtoCart(),
-                                              reminder.showToast(
-                                                  'Product added to Cart')
-                                            ];
-                                    },
-                                    child: Container(
-                                      height: 30,
-                                      width: 100,
-                                      decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(15))),
-                                      child: Center(
-                                          child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          Icon(
-                                            Icons.shopping_cart,
-                                            color: Colors.white,
-                                            size: 18,
-                                          ),
-                                          Text(
-                                            'Move to Cart',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 12),
-                                          ),
-                                        ],
-                                      )),
+                                    SizedBox(
+                                      width: screenwidth / 6,
                                     ),
-                                  )
-                                ],
-                              ),
-                              leading: Container(
-                                margin: EdgeInsets.only(top: 5),
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: NetworkImage(
-                                            '${collections.wishlistProduct[index]['Image']}'),
-                                        fit: BoxFit.fill),
-                                    color: const Color.fromARGB(
-                                        255, 203, 199, 199),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10))),
-                                width: 80,
-                              ),
+                                    InkWell(
+                                      onTap: () {
+                                        bool IsInCart = firebase.cartProductId
+                                            .contains(data
+                                                .WishlistProducts[index]['id']);
+                                        IsInCart
+                                            ? reminder.showToast(
+                                                'Product Already In Cart')
+                                            : [
+                                                InCart.saveItemtoCart(
+                                                    data.WishlistProducts[index]
+                                                        ['Name'],
+                                                    data.WishlistProducts[index]
+                                                        ['Price'],
+                                                    data.WishlistProducts[index]
+                                                        ['Image'],
+                                                    data.WishlistProducts[index]
+                                                        ['Rating'],
+                                                    data.WishlistProducts[index]
+                                                        ['id'],
+                                                    data.WishlistProducts[index]
+                                                        ['Description'],
+                                                    data.WishlistProducts[index]
+                                                        ['Discount']),
+                                                reminder.showToast(
+                                                    'Product Added to Cart')
+                                              ];
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 100,
+                                        decoration: BoxDecoration(
+                                            color: Colors.blue,
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15))),
+                                        child: Center(
+                                            child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Icon(
+                                              Icons.shopping_cart,
+                                              color: Colors.white,
+                                              size: 18,
+                                            ),
+                                            Text(
+                                              'Move to Cart',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12),
+                                            ),
+                                          ],
+                                        )),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                      );
-                    } else {
-                      return Center(
-                          child: SizedBox(
-                              height: 50,
-                              width: 50,
-                              child: CircularProgressIndicator()));
-                    }
-                  }),
-            );
-          }),
+                            leading: Container(
+                              margin: EdgeInsets.only(top: 5),
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: NetworkImage(
+                                          '${data.WishlistProducts[index]['Image']}'),
+                                      fit: BoxFit.fill),
+                                  color:
+                                      const Color.fromARGB(255, 203, 199, 199),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              width: 80,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  } else {
+                    return Center(
+                        child: SizedBox(
+                            height: 50,
+                            width: 50,
+                            child: CircularProgressIndicator()));
+                  }
+                }),
+          )
         ],
       ),
     );
