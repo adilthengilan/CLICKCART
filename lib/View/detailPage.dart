@@ -97,7 +97,7 @@ class _DetailPageState extends State<DetailPage> {
                             widget.Rating,
                             widget.id,
                             widget.Description,
-                            widget.Discount);
+                            widget.Discount,1);
                   },
                   child: Container(
                     decoration: BoxDecoration(

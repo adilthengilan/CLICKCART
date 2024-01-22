@@ -1,12 +1,11 @@
 import 'package:clickcart/Model/collections.dart';
 import 'package:clickcart/View/cartPage/cartProductListing.dart';
+import 'package:clickcart/View/orderPage/orderPage.dart';
 import 'package:clickcart/ViewModel/cart_controller.dart';
 import 'package:clickcart/ViewModel/fetchDataFromFirebase.dart';
 import 'package:clickcart/ViewModel/indexfinder.dart';
 import 'package:clickcart/ViewModel/reminder.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -67,9 +66,14 @@ class _cartState extends State<cart> {
                       if (inCart.totalprices == 0) {
                         reminder.showToast('Please add Products to cart');
                       } else {
-                        inCart.initiateRazorPay();
-                        inCart.startPayment(inCart.totalprices);
-                        addDateandTime(context);
+                        // inCart.initiateRazorPay();
+                        // inCart.startPayment(inCart.totalprices);
+                        // addDateandTime(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OrderPage(),
+                            ));
                       }
                     },
                     child: Text(
@@ -213,4 +217,3 @@ class _cartState extends State<cart> {
     dateandtime.DateandTime = DateFormat('dd/MM/yyyy hh:mm:ss a').format(now);
   }
 }
-

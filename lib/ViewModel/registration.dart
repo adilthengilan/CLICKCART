@@ -1,5 +1,6 @@
-import 'package:clickcart/View/dashboard.dart';
-import 'package:clickcart/View/loginpage.dart';
+import 'package:clickcart/View/homePage/dashboard.dart';
+import 'package:clickcart/View/registrationPage/loginpage.dart';
+import 'package:clickcart/ViewModel/cart_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -29,6 +30,7 @@ class RegistrationProvider extends ChangeNotifier {
       _user = authResult.user;
 
       // Navigate to the home page after successful sign-in
+      createFieldinFirebase();
 
       Navigator.pushReplacement(
         context,

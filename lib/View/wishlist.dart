@@ -24,7 +24,7 @@ class _LikesState extends State<Likes> {
     final InCart = Provider.of<CartProvider>(context, listen: false);
     final data = Provider.of<WishListProvider>(context);
     Reminder reminder = Reminder();
-    double screenwidth = MediaQuery.of(context).size.width;
+    final size = MediaQuery.of(context).size;
     // data.FromFirestore();
 
     final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -66,7 +66,7 @@ class _LikesState extends State<Likes> {
                       itemBuilder: (context, index) {
                         return Container(
                           margin: EdgeInsets.only(left: 15, right: 15, top: 5),
-                          height: 150,
+                          height: 160,
                           decoration: BoxDecoration(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),
@@ -81,6 +81,7 @@ class _LikesState extends State<Likes> {
                                 Row(
                                   children: [
                                     SizedBox(
+                                      height: 45,
                                       width: 120,
                                       child: Text(
                                         data.WishlistProducts[index]['Name'],
@@ -90,7 +91,7 @@ class _LikesState extends State<Likes> {
                                       ),
                                     ),
                                     SizedBox(
-                                      width: screenwidth / 7,
+                                      width: size.width / 7,
                                     ),
                                     InkWell(
                                       onTap: () {
@@ -121,25 +122,31 @@ class _LikesState extends State<Likes> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Text(
-                                  data.WishlistProducts[index]['Description'],
-                                  style: TextStyle(
-                                      fontSize: 12, color: Colors.grey),
+                                SizedBox(
+                                  height: size.height / 20,
+                                  child: Text(
+                                    data.WishlistProducts[index]['Description'],
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                  ),
                                 ),
                                 SizedBox(
-                                  height: screenwidth / 20,
+                                  height: 10,
                                 ),
                                 Row(
                                   children: [
-                                    Text(
-                                      '\$${data.WishlistProducts[index]['Price']}',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w800,
-                                          color: Colors.black),
+                                    SizedBox(
+                                      width: size.width / 6,
+                                      child: Text(
+                                        '\$${data.WishlistProducts[index]['Price']}',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.black),
+                                      ),
                                     ),
                                     SizedBox(
-                                      width: screenwidth / 6,
+                                      width: size.width / 6,
                                     ),
                                     InkWell(
                                       onTap: () {
@@ -164,7 +171,8 @@ class _LikesState extends State<Likes> {
                                                     data.WishlistProducts[index]
                                                         ['Description'],
                                                     data.WishlistProducts[index]
-                                                        ['Discount']),
+                                                        ['Discount'],
+                                                    1),
                                                 reminder.showToast(
                                                     'Product Added to Cart')
                                               ];

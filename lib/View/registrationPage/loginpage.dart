@@ -1,5 +1,5 @@
-import 'package:clickcart/View/dashboard.dart';
-import 'package:clickcart/View/signupPage.dart';
+import 'package:clickcart/View/homePage/dashboard.dart';
+import 'package:clickcart/View/registrationPage/signupPage.dart';
 import 'package:clickcart/ViewModel/cart_controller.dart';
 import 'package:clickcart/ViewModel/functions.dart';
 import 'package:clickcart/ViewModel/registration.dart';
@@ -144,8 +144,9 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    cart.createFieldinFirebase();
+                    reg.signInWithGoogle(context);
                   },
+                  ///////////////////////////////
                   child: Container(
                     margin: EdgeInsets.only(
                         left: MediaQuery.of(context).size.width / 3.1, top: 20),
@@ -220,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
             builder: (context) => Navigators(),
           ));
       print('User signed in: ${userCredential.user!.uid}');
-      Provider.of<CartProvider>(context, listen: false).createFieldinFirebase();
+      createFieldinFirebase();
 
       // Navigate to the next screen or perform necessary actions upon successful login
     } catch (e) {

@@ -6,6 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirebaseProvider extends ChangeNotifier {
   List<dynamic> cartProductId = [];
   List<dynamic> WishlistIds = [];
+  List<dynamic> address = [];
+
   Collections collections = Collections();
   Future<void> fetchDataFromFirestore() async {
     FirebaseAuth fire = FirebaseAuth.instance;
@@ -18,6 +20,7 @@ class FirebaseProvider extends ChangeNotifier {
 
       cartProductId = querySnapshot.get('Productid');
       WishlistIds = querySnapshot.get('WishlistProductId');
+      address = querySnapshot.get('Address');
     } catch (e) {
       print('Error fetching data: $e');
     }

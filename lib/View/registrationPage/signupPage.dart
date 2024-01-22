@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,7 +19,6 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -120,7 +118,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   ScaffoldMessenger.of(context).showSnackBar(snackdemo);
                 } else {
                   signUp(EmailController.text, PasswordController.text);
-
                 }
               },
               child: Container(
@@ -176,38 +173,38 @@ class _SignUpPageState extends State<SignUpPage> {
       // SavePhoneNumber();
       // On successful signup, you can navigate to the next screen or perform other actions.
       print('User signed up: ${userCredential.user!.uid}');
+      Navigator.pop(context);
     } catch (e) {
       // Handle errors here, such as invalid email format, weak password, etc.
       print('Failed to sign up: $e');
     }
   }
 
-  Future<void> SavePhoneNumber() async {
-    try {
-      FirebaseAuth auth = FirebaseAuth.instance;
+  // Future<void> SavePhoneNumber() async {
+  //   try {
+  //     FirebaseAuth auth = FirebaseAuth.instance;
 
-      User? user = auth.currentUser;
-      if (user != null) {
-        String userId = user.uid;
+  //     User? user = auth.currentUser;
+  //     if (user != null) {
+  //       String userId = user.uid;
 
-        // Reference to the collection 'users' in Firestore
-        final users =
-            FirebaseFirestore.instance.collection('users').doc(userId);
-        // Replace 'userData' with the document name or ID
-        // Here, a new document will be created with the user ID
+  //       // Reference to the collection 'users' in Firestore
+  //       final users =
+  //           FirebaseFirestore.instance.collection('users').doc(userId);
+  //       // Replace 'userData' with the document name or ID
+  //       // Here, a new document will be created with the user ID
 
-        await users.set({
-          'PhoneNumber': PhoneNumberController.text,
-          // Add more fields as needed
-        });
+  //       await users.set({
+  //         'PhoneNumber': PhoneNumberController.text,
+  //         // Add more fields as needed
+  //       });
 
-        print('Data saved successfully for user ID: $userId');
-      } else {
-        print('User is not logged in.');
-      }
-    } catch (e) {
-      print('Error saving data: $e');
-    }
-  }
+  //       print('Data saved successfully for user ID: $userId');
+  //     } else {
+  //       print('User is not logged in.');
+  //     }
+  //   } catch (e) {
+  //     print('Error saving data: $e');
+  //   }
+  // }
 }
-

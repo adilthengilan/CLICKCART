@@ -3,6 +3,7 @@ import 'package:clickcart/ViewModel/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
@@ -61,7 +62,7 @@ class _NotificationsState extends State<Notifications> {
 }
 
 class NotifyList extends StatelessWidget {
-   NotifyList({super.key});
+  NotifyList({super.key});
   Collections collections = Collections();
   @override
   Widget build(BuildContext context) {
@@ -98,3 +99,5 @@ class NotifyList extends StatelessWidget {
     pref.setStringList('Notificaion', collections.Notifications);
   }
 }
+
+

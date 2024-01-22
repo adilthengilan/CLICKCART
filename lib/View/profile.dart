@@ -1,10 +1,7 @@
-import 'package:clickcart/View/loginpage.dart';
 import 'package:clickcart/View/splashscreen.dart';
+import 'package:clickcart/View/user_Orders/yourOrderList.dart';
 import 'package:clickcart/View/wishlist.dart';
-import 'package:clickcart/View/yourOrderList.dart';
-import 'package:clickcart/ViewModel/functions.dart';
 import 'package:clickcart/ViewModel/registration.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -87,7 +84,7 @@ class _ProfileState extends State<Profile> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => OrderPage(),
+                      builder: (context) => OrderHistory(),
                     ));
               },
               child: Container(
@@ -257,16 +254,10 @@ class _ProfileState extends State<Profile> {
                                   actions: [
                                     TextButton(
                                         onPressed: () {
-                                          Provider.of<RegistrationProvider>(context,
+                                          Provider.of<RegistrationProvider>(
+                                                  context,
                                                   listen: false)
                                               .signOutUser(context);
-                                          Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    LoginPage(),
-                                              ),
-                                              (route) => false);
                                         },
                                         child: Text('Yes')),
                                     TextButton(
@@ -309,181 +300,3 @@ class _ProfileState extends State<Profile> {
   final textStyle =
       TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white);
 }
-// InkWell(
-//   onTap: () {
-//     Navigator.push(
-//         context,
-//         MaterialPageRoute(
-//           builder: (context) => OrderPage(),
-//         ));
-//   },
-//   child: Container(
-//     margin: EdgeInsets.only(top: 10),
-//     height: 40,
-//     width: MediaQuery.of(context).size.width / 1.3,
-//     decoration: BoxDecoration(
-//         borderRadius: BorderRadius.all(Radius.circular(20)),
-//         color: const Color.fromARGB(255, 234, 234, 234)),
-//     child: Row(
-//       children: [
-//         Padding(
-//           padding: EdgeInsets.only(left: 10),
-//           child: Icon(Icons.shopping_basket),
-//         ),
-//         Text(
-//           '               MyOrders',
-//           style: TextStyle(fontSize: 20),
-//         ),
-//       ],
-//     ),
-//   ),
-// ),
-// InkWell(
-//   onTap: () {
-//     showDialog(
-//       context: context,
-//       builder: (context) {
-//         return AlertDialog(
-//           content: Text(
-//               '"if (the app is broken){ Just refresh and reuse} else{ use and enjoy}"'),
-//           actions: [
-//             TextButton(
-//                 onPressed: () {
-//                   Navigator.pop(context);
-//                 },
-//                 child: Text('Okey'))
-//           ],
-//         );
-//       },
-//     );
-//   },
-//   child: Container(
-//     margin: EdgeInsets.only(top: 10),
-//     height: 40,
-//     width: MediaQuery.of(context).size.width / 1.3,
-//     decoration: BoxDecoration(
-//         borderRadius: BorderRadius.all(Radius.circular(20)),
-//         color: const Color.fromARGB(255, 234, 234, 234)),
-//     child: Row(
-//       children: [
-//         Padding(
-//           padding: EdgeInsets.only(left: 10),
-//           child: Icon(Icons.privacy_tip),
-//         ),
-//         Text(
-//           '                 Privacy',
-//           style: TextStyle(fontSize: 20),
-//         ),
-//       ],
-//     ),
-//   ),
-// ),
-// InkWell(
-//   onTap: () {},
-//   child: Container(
-//     margin: EdgeInsets.only(top: 10),
-//     height: 40,
-//     width: MediaQuery.of(context).size.width / 1.3,
-//     decoration: BoxDecoration(
-//         borderRadius: BorderRadius.all(Radius.circular(20)),
-//         color: const Color.fromARGB(255, 234, 234, 234)),
-//     child: Row(
-//       children: [
-//         Padding(
-//           padding: EdgeInsets.only(left: 10),
-//           child: Icon(Icons.help),
-//         ),
-//         Text(
-//           '           Help & Support',
-//           style: TextStyle(fontSize: 20),
-//         ),
-//       ],
-//     ),
-//   ),
-// ),
-// InkWell(
-//   onTap: () {},
-//   child: Container(
-//     margin: EdgeInsets.only(top: 10),
-//     height: 40,
-//     width: MediaQuery.of(context).size.width / 1.3,
-//     decoration: BoxDecoration(
-//         borderRadius: BorderRadius.all(Radius.circular(20)),
-//         color: const Color.fromARGB(255, 234, 234, 234)),
-//     child: Row(
-//       children: [
-//         Padding(
-//           padding: EdgeInsets.only(left: 10),
-//           child: Icon(Icons.settings),
-//         ),
-//         Text(
-//           '                 Settings',
-//           style: TextStyle(fontSize: 20),
-//         ),
-//       ],
-//     ),
-//   ),
-// ),
-// InkWell(
-//   onTap: () {
-//     SignOut();
-//     Navigator.pushAndRemoveUntil(
-//         context,
-//         MaterialPageRoute(
-//           builder: (context) => LoginPage(),
-//         ),
-//         (route) => false);
-//   },
-//   child: InkWell(
-//     onTap: () {
-//       showDialog(
-//         context: context,
-//         builder: (context) {
-//           return AlertDialog(
-//             content: Text('Are you sure want to Logout'),
-//             actions: [
-//               TextButton(
-//                   onPressed: () {
-//                     Provider.of<fetchDatas>(context,
-//                             listen: false)
-//                         .signOutUser(context);
-//                     Navigator.pushAndRemoveUntil(
-//                         context,
-//                         MaterialPageRoute(
-//                           builder: (context) => LoginPage(),
-//                         ),
-//                         (route) => false);
-//                   },
-//                   child: Text('Yes')),
-//               TextButton(
-//                   onPressed: () {
-//                     Navigator.pop(context);
-//                   },
-//                   child: Text('No'))
-//             ],
-//           );
-//         },
-//       );
-//     },
-//     child: Container(
-//       margin: EdgeInsets.only(top: 10),
-//       height: 40,
-//       width: MediaQuery.of(context).size.width / 1.3,
-//       decoration: BoxDecoration(
-//           borderRadius: BorderRadius.all(Radius.circular(20)),
-//           color: const Color.fromARGB(255, 234, 234, 234)),
-//       child: Row(
-//         children: [
-//           Padding(
-//             padding: EdgeInsets.only(left: 10),
-//             child: Icon(Icons.logout_outlined),
-//           ),
-//           Text(
-//             '                 Logout',
-//             style: TextStyle(fontSize: 20),
-//           ),
-//         ],
-//       ),
-//     ),
-//   ),
-// )

@@ -1,4 +1,7 @@
 import 'package:clickcart/Model/collections.dart';
+import 'package:clickcart/Model/constants/colors.dart';
+import 'package:clickcart/Model/constants/styles.dart';
+import 'package:clickcart/View/user_Orders/invoice.dart';
 import 'package:clickcart/ViewModel/fetchDataFromFirebase.dart';
 import 'package:clickcart/ViewModel/functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,14 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class OrderPage extends StatefulWidget {
-  const OrderPage({super.key});
+class OrderHistory extends StatefulWidget {
+  const OrderHistory({super.key});
 
   @override
-  State<OrderPage> createState() => _OrderPageState();
+  State<OrderHistory> createState() => _OrderHistoryState();
 }
 
-class _OrderPageState extends State<OrderPage> {
+class _OrderHistoryState extends State<OrderHistory> {
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<FirebaseProvider>(context);
@@ -53,6 +56,7 @@ class Orderlist extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     final data = Provider.of<fetchDatas>(context);
 
     return StreamBuilder<DocumentSnapshot>(
@@ -67,8 +71,8 @@ class Orderlist extends StatelessWidget {
               itemCount: YourOrdersList.length,
               itemBuilder: (context, index) {
                 List<dynamic> Orders = YourOrdersList[index]['orders'];
-                return Column(
-                  children: [
+                return Column(children: [
+                  Stack(children: [
                     Container(
                       margin: EdgeInsets.only(left: 15, right: 15, top: 5),
                       decoration: BoxDecoration(
@@ -110,7 +114,25 @@ class Orderlist extends StatelessWidget {
                             itemBuilder: (context, index) {
                               return ListTile(
                                 title: Text(Orders[index]['Name']),
-                                subtitle: Text('\$${Orders[index]['Price']}'),
+                                subtitle: Row(
+                                  children: [
+                                    SizedBox(
+                                        width: 100,
+                                        child: Text(
+                                            '\$${Orders[index]['Price']}')),
+                                    SizedBox(
+                                      width: size.width / 7,
+                                    ),
+                                    Container(
+                                      height: 20,
+                                      width: 100,
+                                      child: Center(
+                                        child: Text(
+                                            'Qty : ${Orders[index]['quantity']}'),
+                                      ),
+                                    )
+                                  ],
+                                ),
                                 leading: Container(
                                     height: 50,
                                     width: 50,
@@ -121,11 +143,41 @@ class Orderlist extends StatelessWidget {
                               );
                             },
                           ),
+                          InkWell(
+                            onTap: () async {
+                              // generate pdf file
+                              final pdfFile = await PdfInvoiceApi.generate(
+                                  YourOrdersList[index]['total'],
+                                  Orders,
+                                  context);
+
+                              // opening the pdf file
+                              FileHandleApi.openFile(pdfFile);
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(
+                                  left: size.width / 2, top: 20),
+                              decoration: BoxDecoration(
+                                  boxShadow: [BoxShadow(blurRadius: 2)],
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                  color: Color.fromARGB(255, 197, 197, 197)),
+                              height: size.height / 25,
+                              width: size.width / 2.5,
+                              child: Center(
+                                child:
+                                    Text('Download Invoice', style: BoldText),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          )
                         ],
                       ),
                     ),
-                  ],
-                );
+                  ]),
+                ]);
               },
             );
           } else {

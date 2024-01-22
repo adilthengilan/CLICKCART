@@ -25,13 +25,20 @@ final class _CategoriesState extends State<Categories> {
   Reminder reminder = Reminder();
   @override
   Widget build(BuildContext context) {
+    final ScreenHeight = MediaQuery.of(context).size.height;
+    final ScreenWith = MediaQuery.of(context).size.width;
+
     final data = Provider.of<FirebaseProvider>(context);
+
     final api = Provider.of<fetchDatas>(context);
+
     final cart = Provider.of<CartProvider>(context, listen: false);
+
     final filter = Provider.of<FilterProvider>(context);
     data.fetchDataFromFirestore();
     if (api.products.products.isNotEmpty) {
       return GridView.builder(
+        physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             childAspectRatio: 100 / 125,
@@ -112,14 +119,16 @@ final class _CategoriesState extends State<Categories> {
                             child: Text(
                               '${products[index].title}',
                               style: TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 15),
+                                  fontWeight: FontWeight.w500, fontSize: 12),
                             ),
                           ),
                         ),
                         Row(
                           children: [
                             Container(
-                                margin: EdgeInsets.only(left: 15),
+                                margin: EdgeInsets.only(
+                                    left: ScreenWith / 15,
+                                    top: ScreenHeight / 70),
                                 child: Text(
                                   '\$${products[index].price}',
                                   style: TextStyle(
@@ -127,16 +136,21 @@ final class _CategoriesState extends State<Categories> {
                                       fontSize: 18),
                                 )),
                             Padding(
-                              padding: EdgeInsets.only(left: 20),
+                              padding: EdgeInsets.only(
+                                  left: 20, top: ScreenHeight / 70),
                               child: Icon(Icons.star),
                             ),
-                            Text('${products[index].rating}')
+                            Padding(
+                              padding: EdgeInsets.only(top: ScreenHeight / 70),
+                              child: Text('${products[index].rating}'),
+                            )
                           ],
                         ),
                       ],
                     ),
                     Container(
-                      margin: EdgeInsets.only(top: 165, left: 110),
+                      margin: EdgeInsets.only(
+                          top: ScreenHeight / 4.8, left: ScreenWith / 3.5),
                       height: 30,
                       width: 30,
                       decoration: BoxDecoration(
@@ -156,7 +170,8 @@ final class _CategoriesState extends State<Categories> {
                                       products[index].rating,
                                       products[index].id,
                                       products[index].description,
-                                      products[index].discountPercentage),
+                                      products[index].discountPercentage,
+                                      1),
                                   reminder.showToast('Product added to Cart')
                                 ];
                         },

@@ -1,7 +1,7 @@
-
 import 'package:clickcart/Model/collections.dart';
 import 'package:clickcart/ViewModel/cart_controller.dart';
 import 'package:clickcart/ViewModel/indexfinder.dart';
+import 'package:clickcart/ViewModel/quantityController.dart';
 import 'package:clickcart/ViewModel/reminder.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -89,8 +89,16 @@ class _CartssState extends State<Cartss> {
                                   children: [
                                     InkWell(
                                       onTap: () {
-                                        // indexFinder.findProductIndex(collections
-                                        //     .cartProduct[index]['Name']);
+                                        if (data.Cartproducts[index]
+                                                ['quantity'] !=
+                                            1) {
+                                          quantityDecreasing(
+                                              data.Cartproducts[index]['Name'],
+                                              data.Cartproducts[index]['Price'],
+                                              data.Cartproducts[index]
+                                                      ['quantity'] -
+                                                  1);
+                                        }
                                       },
                                       child: Container(
                                         child: Center(
@@ -110,7 +118,7 @@ class _CartssState extends State<Cartss> {
                                     Container(
                                       child: Center(
                                           child: Text(
-                                        '1',
+                                        '${data.Cartproducts[index]['quantity']}',
                                         style: TextStyle(fontSize: 11.5),
                                       )),
                                       height: 20,
@@ -119,9 +127,12 @@ class _CartssState extends State<Cartss> {
                                     ),
                                     InkWell(
                                       onTap: () {
-                                        // data.findProductIndex(
-                                        //     data.cartProduct[index]['Name']);
-                                        // data.quantityindex = index;
+                                        quantityIncreasing(
+                                            data.Cartproducts[index]['Name'],
+                                            data.Cartproducts[index]['Price'],
+                                            data.Cartproducts[index]
+                                                    ['quantity'] +
+                                                1);
                                       },
                                       child: Container(
                                         child: Center(child: Text('+')),
@@ -167,7 +178,8 @@ class _CartssState extends State<Cartss> {
                                           productId[index],
                                           data.Cartproducts[index]
                                               ['Description'],
-                                          data.Cartproducts[index]['Discount']);
+                                          data.Cartproducts[index]['Discount'],
+                                          data.Cartproducts[index]['quantity']);
                                       reminder.showToast(
                                           'Product Removed from cart');
                                       data.getTotalAmount();
@@ -246,7 +258,7 @@ class _CartssState extends State<Cartss> {
               //             borderRadius: BorderRadius.all(Radius.circular(20)),
               //             color: Color.fromARGB(255, 199, 7, 7)),
               //         height: 40,
-              //         width: 90,
+              //         width: 90
               //         child: TextButton(
               //             onPressed: () {
               //               if (data.totalamount == 0) {

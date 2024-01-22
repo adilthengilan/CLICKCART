@@ -1,8 +1,7 @@
-import 'package:clickcart/Model/collections.dart';
+import 'package:clickcart/View/user_Orders/inAppNotification.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
@@ -10,11 +9,11 @@ class CartProvider extends ChangeNotifier {
   int totalprices = 0;
   String DateandTime = '';
   List<dynamic> Cartproducts = [];
-  Collections collections = Collections();
 
   final Razorpay _razorpay = Razorpay();
 
   FirebaseAuth auth = FirebaseAuth.instance;
+
   ////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
   ///_______THIS FUNCTION IS USED FOR SAVE THE PRODUCTS TO CART IN FIREBASE.
@@ -42,33 +41,18 @@ class CartProvider extends ChangeNotifier {
 
     final total = await user.get();
     totalprices = total['total'];
-    print(totalprices);
     notifyListeners();
   }
 
-  Future<void> createFieldinFirebase() async {
-    if (auth.currentUser != null) {
-      String userId = auth.currentUser!.uid;
-      final users = FirebaseFirestore.instance.collection('users').doc(userId);
-
-      final userssnap = await users.get();
-
-      if (!userssnap.exists) {
-        await users.set({
-          'carts': [],
-          'total': 0,
-          'Productid': [],
-          'wishlist': [],
-          'yourOrders': []
-
-          // Add more fields as needed
-        });
-      }
-    }
-  }
-
-  Future<void> saveItemtoCart(String Name, int Price, String thumbnail,
-      double Rating, int id, String Description, double Discount) async {
+  Future<void> saveItemtoCart(
+      String Name,
+      int Price,
+      String thumbnail,
+      double Rating,
+      int id,
+      String Description,
+      double Discount,
+      int quantity) async {
     try {
       if (auth.currentUser != null) {
         String userId = auth.currentUser!.uid;
@@ -91,7 +75,8 @@ class CartProvider extends ChangeNotifier {
                 'Image': thumbnail,
                 'Rating': Rating,
                 'Description': Description,
-                'Discount': Discount
+                'Discount': Discount,
+                'quantity': quantity
               }
             ]),
             'total': totalamount,
@@ -110,9 +95,15 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> removeItemFromCart(String Name, int Price, String thumbnail,
-      double Rating, int id, String Description, double Discount) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
+  Future<void> removeItemFromCart(
+      String Name,
+      int Price,
+      String thumbnail,
+      double Rating,
+      int id,
+      String Description,
+      double Discount,
+      int quantity) async {
     User? user = auth.currentUser;
 
     final users = FirebaseFirestore.instance.collection('users').doc(user!.uid);
@@ -131,7 +122,8 @@ class CartProvider extends ChangeNotifier {
               'Image': thumbnail,
               'Rating': Rating,
               'Description': Description,
-              'Discount': Discount
+              'Discount': Discount,
+              'quantity': quantity
             }
           ]),
           'total': totalamount,
@@ -146,27 +138,45 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> createOrderDetailsField() async {
-    if (auth.currentUser != null) {
-      String userId = auth.currentUser!.uid;
-      final users = FirebaseFirestore.instance.collection('users').doc(userId);
-      // final userssnap = await users.get();
-      await users.set({
-        'YourOrders': [],
+  // Future<void> removeIteFromCart(String Name, int Price, String thumbnail,
+  //     double Rating, int id, String Description, double Discount, ) async {
+  //   User? user = auth.currentUser;
 
-        // Add more fields as needed
-      });
-      // if (!userssnap.exists) {
+  //   final users = FirebaseFirestore.instance.collection('users').doc(user!.uid);
+  //   final userssnap = await users.get();
+  //   int totalamount = userssnap['total'] - Price;
+  //   try {
+  //     if (userssnap.exists) {
+  //       await FirebaseFirestore.instance
+  //           .collection('users')
+  //           .doc(user.uid)
+  //           .update({
+  //         'carts': FieldValue.arrayUnion([
+  //           {
+  //             'Name': Name,
+  //             'Price': Price,
+  //             'Image': thumbnail,
+  //             'Rating': Rating,
+  //             'Description': Description,
+  //             'Discount': Discount,
+  //             'quantity': quantity
+  //           }
+  //         ]),
+  //         'total': totalamount,
+  //         'Productid': FieldValue.arrayRemove([id]),
+  //       });
+  //     }
+  //     notifyListeners();
 
-      // }
-    }
-  }
+  //     // print('Item  removed from cart successfully$currentindex');
+  //   } catch (e) {
+  //     print('Error removing item from cart: $e');
+  //   }
+  // }
 
   Future<void> saveOrderDetails(
       String Time, int Total, List<dynamic> Orders) async {
     try {
-      FirebaseAuth auth = FirebaseAuth.instance;
-
       User? user = auth.currentUser;
       if (user != null) {
         String userId = user.uid;
@@ -197,7 +207,6 @@ class CartProvider extends ChangeNotifier {
   }
 
   void CleanCart() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
     User? user = auth.currentUser;
     try {
       await FirebaseFirestore.instance
@@ -251,9 +260,30 @@ class CartProvider extends ChangeNotifier {
       print("Error: $e");
     }
   }
+}
 
-  void addDateandTime(BuildContext context) {
-    DateTime now = DateTime.now();
-    collections.TimeandDate = DateFormat('dd/MM/yyyy hh:mm:ss a').format(now);
+///////////////////////////////////____this function is placed as globally for reusable the
+/// code to create field in firebase-----------
+Future<void> createFieldinFirebase() async {
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+  if (auth.currentUser != null) {
+    String userId = auth.currentUser!.uid;
+    final users = FirebaseFirestore.instance.collection('users').doc(userId);
+
+    final userssnap = await users.get();
+
+    if (!userssnap.exists) {
+      await users.set({
+        'carts': [],
+        'total': 0,
+        'Productid': [],
+        'wishlist': [],
+        'yourOrders': [],
+        'Address': []
+
+        // Add more fields as needed
+      });
+    }
   }
 }

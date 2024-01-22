@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'package:clickcart/View/dashboard.dart';
-import 'package:clickcart/View/loginpage.dart';
+import 'package:clickcart/View/homePage/dashboard.dart';
+import 'package:clickcart/View/registrationPage/loginpage.dart';
+import 'package:clickcart/View/user_Orders/inAppNotification.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:clickcart/ViewModel/functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,6 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Timer(Duration(seconds: 3), () {
       checkInternet();
+      // PushNotificationService().initialize(context);
     });
   }
 
